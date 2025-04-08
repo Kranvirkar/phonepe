@@ -1,13 +1,13 @@
 const axios = require("axios");
 const sha256 = require("sha256");
-const { merchantId, baseUrl, saltKey, appBeUrl, saltIndex} = require("../config/phonepeConfig");
+const { merchantId, baseUrl, saltKey, appBeUrl, saltIndex } = require("../config/phonepeConfig");
 const uniqid = require("uniqid");
 const { encodePayload, createSignature } = require("../utils/phonepeHelper");
 
 const apiPath = "/pg/v1/pay";
 
 const createPayment = async (req, res) => {
-    const { amount, mobileNumber = "9999999999" } = req.body;
+    const { amount, mobileNumber } = req.body;
 
     let userId = "MUID123";
 
@@ -40,31 +40,36 @@ const createPayment = async (req, res) => {
     let xVerifyChecksum = sha256_val + "###" + saltIndex;
     //console.log("xVerifyChecksum "+xVerifyChecksum);
     axios
-        .post(
-            `${baseUrl}/pg/v1/pay`,
-            {
-                request: base64EncodedPayload,
+    .post(
+        `${baseUrl}/pg/v1/pay`,
+        {
+            request: base64EncodedPayload,
+        },
+        {
+            headers: {
+                "Content-Type": "application/json",
+                "X-VERIFY": xVerifyChecksum,
+                accept: "application/json",
             },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-VERIFY": xVerifyChecksum,
-                    accept: "application/json",
-                },
-            }
-        )
-        .then(function (response) {
-            console.log("response->", JSON.stringify(response.data));
-            res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
-        })
-        .catch(function (error) {
-            console.error("Payment Error:", error.response?.data || error.message);
-            res.status(500).json({
-                success: false,
-                message: "Payment creation failed",
-                error: error.response?.data || error.message,
-            });
-        });
-};
+        }
+    )
+    .then(function (response) {
+        console.log("response->", JSON.stringify(response.data));
+        //res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
+        const redirectUrl = response.data.data.instrumentResponse.redirectInfo.url;
 
+    // Transaction.create({ userId, amount, mobileNumber: payload.mobileNumber, transactionId, status: 'initiated' });
+    //res.status(200).json({msg : "OK", url: response.data.data.instrumentResponse.redirectInfo.url})
+    res.status(200).json({ qrUrl: redirectUrl, amount, mobileNumber: normalPayLoad.mobileNumber });
+
+    })
+    .catch(function (error) {
+        console.error("Payment Error:", error.response?.data || error.message);
+        res.status(500).json({
+            success: false,
+            message: "Payment creation failed",
+            error: error.response?.data || error.message,
+        });
+    });
+};
 module.exports = { createPayment };

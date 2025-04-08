@@ -1,5 +1,6 @@
 backend/.env
 phonepe-frontend/
+frontend/
 # Node modules
 backend/node_modules/
 

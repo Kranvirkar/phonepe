@@ -18,7 +18,6 @@
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "mongoose": "^8.13.2",
-    "pg-sdk-node": "https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node.tgz",
     "sha256": "^0.2.0",
     "uniqid": "^5.4.0"
   }
